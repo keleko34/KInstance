@@ -1,0 +1,54 @@
+{
+  "name": "KInstance",
+  "version": "0.0.0",
+  "description": "Creates a single component instance and ties all sub libraries together",
+  "keywords": [
+    "mapper",
+    "binding",
+    "maps",
+    "bindable dom"
+  ],
+  "author": {
+    "name": "Keleko34",
+    "email": "gregory.guidero@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Gregory Guidero"
+    }
+  ],
+  "main": "index",
+  "license": {
+    "type": "MIT",
+    "url": "http://en.wikipedia.org/wiki/MIT_License"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/keleko34/KInstance.git"
+  },
+  "bugs": {
+    "url": "https://github.com/keleko34/KInstance/issues"
+  },
+  "devDependencies": {
+    "K_Tasks": "^0.4.8"
+  },
+  "scripts": {
+    "installer": "npm i git+https://github.com/keleko34/gulp.git -g && npm i && bower i",
+    "i": "npm i git+https://github.com/keleko34/gulp.git -g && npm i && bower i",
+    "build": "gulp build",
+    "server": "gulp server"
+  },
+  "maintainers": [
+    {
+      "name": "keleko34",
+      "email": "gregory.guidero@gmail.com"
+    }
+  ],
+  "directories": {},
+  "dependencies": {
+    "KB": "^0.6.1",
+    "KMapper": "0.0.6",
+    "KObservableViewmodel": "^0.4.0",
+    "KTemplates": "0.0.1"
+  }
+}

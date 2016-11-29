@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Testing</title>
+    <script>
+      document.write('<script src="requirejs" type="text\/javascript"><\/script>');
+    </script>
+  </head>
+  <body>
+    <div id="main"></div>
+    <script>
+
+      /*
+      require.config({
+          urlArgs: "bust=v2"
+      });
+      require([
+        ("js/init"+1+".js"),
+        ("js/init"+2+".js"),
+        ("js/init"+3+".js"),
+        ("js/init"+4+".js"),
+        ("js/init"+5+".js"),
+        ("js/init"+6+".js"),
+        ("js/init"+7+".js"),
+        ("vinit"+8+".js"),
+        ("js/init"+9+".js"),
+        ("js/init"+10+".js"),
+        ("js/init"+11+".js"),
+        ("js/init"+12+".js"),
+        ("js/init"+13+".js"),
+        ("js/init"+14+".js"),
+        ("js/init"+15+".js"),
+      ],function(){
+        console.log("Finished Loading");
+      });
+      */
+      /*
+          var count = 1;
+          function ld()
+          {
+            count += 2;
+            if(count < 15) require(['./js/init'+count,'./js/init'+(count+1)],ld);
+          }
+
+          require(['./js/init'+count,'./js/init'+(count+1)],ld);
+      *//*
+        var name = "init",
+            count = 1;
+            function ld(c)
+            {
+              count = c+2;
+              var c = parseInt(count);
+              if(count < 15)
+              {
+                console.log("loaded "+name+c);
+                document.write('<script src="js/'+name+c+'.js" onload="ld(count)" type="text\/javascript"><\/script>');
+                document.write('<script src="js/'+name+(c+1)+'.js" onload="ld(count)" type="text\/javascript"><\/script>');
+              }
+            }
+
+            function ldc()
+            {
+              console.log("loaded "+name+".css");
+            }
+            var c = parseInt(count);
+            document.write('<script src="js/'+name+c+'.js" onload="ld(count)" type="text\/javascript"><\/script>');
+      console.log("sec");
+            document.write('<script src="js/'+name+(c+1)+'.js" onload="ld(count)" type="text\/javascript"><\/script>');
+            console.log("third");
+            document.write('<link rel="stylesheet" href="'+name+'.css" onload="ldc()" />');
+            console.log("4th");
+           */
+        /*
+        var count = 1;
+
+        function fn(e)
+        {
+
+        }
+
+        function create(l,c)
+        {
+          var node = document.createElement('script');
+          node.type = 'text/javascript';
+          node.charset = 'utf-8';
+          node.async = true;
+          node.src = l+c+'.js';
+          node.onload = fn;
+          return node;
+        }
+
+        for(var x=1,len=17;x<len;x++)
+        {
+          (function(count){
+            document.head.appendChild(create('js/init',x));
+          }(x));
+        }
+      */
+
+      /*
+      function createNode(text)
+      {
+        var node = document.createElement('script');
+        node.type = 'text/javascript';
+        node.charset = 'utf-8';
+        node.innerHTML = text;
+        return node;
+      }
+
+      for(var x=1,len=17;x<len;x++)
+      {
+        (function(count){
+          var xhr = new XMLHttpRequest();
+          xhr.onload = function(e) {document.head.appendChild(createNode(xhr.responseText));}
+          xhr.open("GET",("js\/init"+count+".js"),true);
+          xhr.send(null);
+        }(x));
+      }
+      */
+      /*
+        for(var x=1,len=17;x<len;x++)
+        {
+          (function(count){
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(e) {main.innerHTML += xhr.responseText;}
+            xhr.open("GET",("html\/init"+count+".html"),true);
+            xhr.send(null);
+          }(x));
+        }
+      */
+      /*
+      for(var x=1,len=17;x<len;x++)
+        {
+          (function(count){
+            var xhr = document.createElement('iframe');
+            xhr.onload = function(e) {main.innerHTML += xhr.contentDocument.body.innerHTML;document.body.removeChild(xhr);}
+            xhr.src = "html\/init"+count+".html";
+            document.body.appendChild(xhr);
+          }(x));
+        }
+        */
+    </script>
+    <script>
+      console.log("after load");
+    </script>
+  </body>
+</html>
+

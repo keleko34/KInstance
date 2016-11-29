@@ -1,0 +1,30 @@
+{
+  "name": "KInstance",
+  "description": "Creates a single component instance and ties all sub libraries together",
+  "version": "0.0.1",
+  "main": "index",
+  "authors": [
+    "Keleko34"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "Object",
+    "Array",
+    "Bindable Data",
+    "Observable",
+    "Data Binding",
+    "Data Change Events"
+  ],
+  "homepage": "https://github.com/keleko34/KInstance",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    ".gulp"
+  ],
+  "devDependencies": {
+    "requirejs": "~2.1.11"
+  }
+}
