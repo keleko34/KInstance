@@ -7,9 +7,42 @@
     </script>
   </head>
   <body>
-    <div id="main"></div>
+    <test id="main"></test>
+    <list id="list"></list>
     <script>
+      require(['KInstance/Build/KInstance'],function(KInstance){
+        var instance = KInstance();
+        var testTemplate = "<div class='{{display}}'><p>Hello <span>{{name | toUpperCase}}</span></p><br /><input type='password' value='{{password}}' /></div>";
 
+        function testModel(){
+          this.display = "display-true";
+          this.name = "";
+          this.password = "";
+        }
+
+        var listTemplate = "<ul>{{for items loop listitem}}</ul>";
+        var listItem = "<li>{{name}}</li>";
+
+         function listmodel(){
+            this.items = [
+              {name:'cool'},
+              {name:'stuff'},
+              {name:'fancy'}
+            ];
+          }
+
+        function listitemmodel()
+        {
+
+        }
+
+
+        instance.register('test',testModel,testTemplate);
+        instance.register('list',listmodel,listTemplate);
+        instance.register('listitem',listitemmodel,listItem);
+        instance(main);
+        instance(list);
+      })
     </script>
   </body>
 </html>
