@@ -42,16 +42,15 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
        </div>
     */
 
-    function KInstance(node)
+
+    /* instance --> Create VM,Replace Template --> Attach VM, Map --> bind values --> search inner Components */
+
+    function KInstance(node,pre,post)
     {
       var _name = node.tagName.toLowerCase(),
-          _post = KInstance.fetchAttributes(node),
-          _pre = {
-            filters:{}
-          },
-          _params = [],
           _template = document.createElement('div'),
-          _childNodes = node.childNodes;
+          _childNodes = node.childNodes,
+          _viewmodel = KV(node,[],pre,post);
 
 
 
@@ -62,14 +61,8 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
 
       Object.defineProperties(_template,{
         kb_viewmodel:{
-          value:KV.createViewModel(_name,_params,_pre,_post),
+          value:_viewmodel,
           writable:false,
-          enumerable:false,
-          configurable:false
-        },
-        kb_maps:{
-          value:KM.map(_template),
-          writable:true,
           enumerable:false,
           configurable:false
         }
