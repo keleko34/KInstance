@@ -23,6 +23,19 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
       return a._preventDefault;
     };
 
+    function setStopChange(obj,prop,val)
+    {
+      if(KV.isArray(val) && typeof obj[prop] === 'function')
+      {
+        obj._stopChange = true;
+        obj[prop].apply(obj,val);
+        obj._stopChange = null;
+      }
+      else
+      {
+        Object.getOwnPropertyDescriptor(obj,prop).set.call(obj,val,true);
+      }
+    }
 
     /* what does this do?
        takes in unkown element, reads attributes to object, maps outside binds as pointers, searches for unkowns in html to load, creates viewmodel, binds values
@@ -43,22 +56,24 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
     */
 
 
-    /* instance --> Create VM,Replace Template --> Attach VM, Map --> bind values --> search inner Components */
+    /* instance --> Create VM,Replace Template --> Attach VM, Map --> bind values --> search inner Components --> Map For Loops */
 
     function KInstance(node,pre,post)
     {
+      /* Create VM */
       var _name = node.tagName.toLowerCase(),
           _template = document.createElement('div'),
           _childNodes = node.childNodes,
           _viewmodel = KV(node,[],pre,post);
 
 
-
+      /* Replace Template */
       _template.class = _name+"__Wrapper";
       _template.innerHTML = KT.getTemplate(_name);
       node.replaceWith(_template);
       node = null;
 
+      /* Attach VM */
       Object.defineProperties(_template,{
         kb_viewmodel:{
           value:_viewmodel,
@@ -68,19 +83,43 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
         }
       });
 
-      console.log(_template.kb_viewmodel,_template.kb_maps);
+      /* Map Node */
+      KM.addActionListener('update',function(e){
 
-      /* bind maps */
+        /* update VM on change */
+        console.log(e);
+
+      })
+      .call(null,node);
+
+      /* bind values */
       for(var x=0,len=_template.kb_maps.length;x<len;x++)
       {
         var map = _template.kb_maps[x];
         if(map.type === 'attribute')
         {
+          /* Bind VM Data to the attributes */
+          var binds = Object.keys(map.binds);
+          for(var i=0,lenI=binds.length;i<len;i++)
+          {
+            _template.kb_viewmodel.addDataUpdateListener(binds[i].key,function(e){
 
+              /* need to add bindTexts */
+                var val = map.bindTexts.map(function(t){
+                  if(KV.isObject(t))
+                  {
+                    return t.filters.reduce(function(val,filter){
+                      return filter(val);
+                    },(e.prop !== t.key ? t.value : e.value));
+                  }
+                }).join('');
+                setStopChange(map.target,'setAttribute',[map.prop,val]);
+            });
+          }
         }
         else if(map.type === 'text')
         {
-          /* if we are adding outside html to this one */
+          /* Adds containment HTML from the unkown Element components children from previous component */
           if(map.binds.html && map.texts.length === 1){
             for(var i=0,lenI=_childNodes.length;i<lenI;i++)
             {
@@ -89,13 +128,21 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
             map.parent.removeChild(map.target);
             _template.kb_maps.splice(x,1);
           }
-          else{
-
+          else
+          {
+            /* Bind VM Data to the texts */
           }
+        }
+        else if(map.type === 'for'){
+
+          /* append to for group for taking care of later */
+
         }
       }
 
-      /* instance neuvo templatas */
+      /* search inner Components */
+
+      /* Map For Loops */
 
 
     }
@@ -135,7 +182,6 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
       }
       return _attrs;
     }
-
 
     return KInstance;
   }
