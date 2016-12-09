@@ -64,6 +64,7 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
       var _name = node.tagName.toLowerCase(),
           _template = document.createElement('div'),
           _childNodes = node.childNodes,
+          _forData = [],
           _viewmodel = KV(node,[],pre,post);
 
 
@@ -104,7 +105,6 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
           {
             _template.kb_viewmodel.addDataUpdateListener(binds[i].key,function(e){
 
-              /* need to add bindTexts */
                 var val = map.bindTexts.map(function(t){
                   if(KV.isObject(t))
                   {
@@ -131,12 +131,32 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
           else
           {
             /* Bind VM Data to the texts */
+            var binds = Object.keys(map.binds);
+            for(var i=0,lenI=binds.length;i<len;i++)
+            {
+              _template.kb_viewmodel.addDataUpdateListener(binds[i].key,function(e){
+
+                var val = map.bindTexts.map(function(t){
+                  if(KV.isObject(t))
+                  {
+                    return t.filters.reduce(function(val,filter){
+                      return filter(val);
+                    },(e.prop !== t.key ? t.value : e.value));
+                  }
+                }).join('');
+                setStopChange(map.target,map.prop,val);
+            });
+            }
           }
+        }
+        else if(map.type === 'component')
+        {
+          /* Mapping Takes care of this */
         }
         else if(map.type === 'for'){
 
           /* append to for group for taking care of later */
-
+          _forData.push(map);
         }
       }
 
