@@ -46,9 +46,9 @@
   ],
   "directories": {},
   "dependencies": {
-    "KB": "^0.6.9",
-    "KMapper": "^0.1.2",
-    "KObservableViewmodel": "^0.4.3",
+    "KB": "^0.7.2",
+    "KMapper": "^0.2.1",
+    "KObservableViewmodel": "^0.4.7",
     "KTemplates": "^0.0.3",
     "kbatchloader": "^0.0.2"
   }
