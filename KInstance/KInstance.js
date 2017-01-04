@@ -58,28 +58,35 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
 
     function KInstance(node,pre,post)
     {
+      
       /* Create VM */
       var _name = node.tagName.toLowerCase(),
           _template = document.createElement('div'),
-          _childNodes = node.childNodes,
+          _unknowns = [],
+          _childNodes = Array.prototype.slice.call(node.childNodes),
           _forData = [],
           _viewmodel = KV(node,[],pre,post);
 
 
       /* Replace Template */
-      _template.class = _name+"__Wrapper";
+      _template.className = _name+"__Wrapper";
       _template.innerHTML = KT.getTemplate(_name);
+      _unknowns = KT.getUnknownElements(_template.innerHTML);
       node.replaceWith(_template);
+      if(node.onload) node.onload(_template,_viewmodel);
       node = null;
 
       /* Attach VM */
-      Object.defineProperties(_template,{
-        kb_viewmodel:{
-          value:_viewmodel,
-          writable:false,
-          enumerable:false,
-          configurable:false
-        }
+      Array.prototype.slice.call(_template.querySelectorAll('*'))
+      .forEach(function(el){
+        Object.defineProperties(_template,{
+          kb_viewmodel:{
+            value:_viewmodel,
+            writable:false,
+            enumerable:false,
+            configurable:false
+          }
+        });
       });
 
       /* Map Node */
@@ -122,9 +129,10 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
             if(map.binds.html && map.texts.length === 1){
               for(var i=0,lenI=_childNodes.length;i<lenI;i++)
               {
-                map.parent.insertBefore(map.target,_childNodes[i]);
+                map.parent.stopChange().insertBefore(_childNodes[i],map.target);
               }
-              map.parent.removeChild(map.target);
+              _childNodes = null;
+              map.parent.stopChange().removeChild(map.target);
               node.kb_maps.splice(x,1);
             }
             else
@@ -154,11 +162,58 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
         }(_template.kb_maps[x],_template));
       }
 
-      /* search inner Components */
-
       /* Map For Loops */
-
-
+      for(var x=0,len=_forData.length;x<len;x++)
+      { 
+        (function(fordata){
+          /* clear html to get ready for appendChild */
+          fordata.parent.stopChange().innerHTML = "";
+          
+          fordata.data = _viewmodel[fordata.binds.key];
+          
+          _unknowns.push(fordata.binds.component);
+          
+          /* add listeners for watching adds or removes or changes in the array */
+          watchforArray(_viewmodel[fordata.binds.key],fordata);
+          
+          for(var i=0,lenI=_viewmodel[fordata.binds.key].length;i<lenI;i++)
+          {
+            (function(componentName,data,filters){
+              var filtered = false;
+              for(var z=0,lenZ=filters.length;z<lenZ;z++)
+              {
+                if(filters[z](data) === false) filtered = true;
+              }
+              if(!filtered)
+              {
+                var comp = document.createElement(componentName);
+                comp.post = data;
+                fordata.parent.stopChange().appendChild(comp);
+                comp = null;
+              }
+            }(fordata.binds.component,_viewmodel[fordata.binds.key][i],fordata.binds.filters));
+          }
+        }(_forData[x]));
+      }
+      
+      /* search inner Components */
+      var notLoaded = _unknowns.filter(function(unknown){
+        return !KT.isRegistered(unknown);
+      })
+      .map(function(item){
+        return '/component/'+item+'.js';
+      });
+      
+      if(notLoaded.length !== 0)
+      {
+        KL.fetchBatch(notLoaded,function(){
+          replaceUnknowns(_template,_unknowns);
+        });
+      }
+      else
+      {
+        replaceUnknowns(_template,_unknowns);
+      }
     }
 
     function actionObject(type,data,args)
@@ -169,6 +224,33 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
       this.type = type;
       this.data = data;
       this.args = args;
+    }
+    
+    function watchforArray(data,forMap)
+    {
+      function onChange()
+      {
+        /* when change happens reupdate nodes depending on action, sort does flush/reapply, add/remove simply appends/removes */
+        
+      }
+      
+      data.addActionListener('add',onChange)
+      .addActionListener('remove',onChange)
+      .addActionListener('sort',onChange);
+    }
+    
+    function replaceUnknowns(node,unknowns)
+    {
+      for(var x=0,len=unknowns.length;x<len;x++)
+      {
+        (function(unknown,parent){
+          var nodes = parent.querySelectorAll(unknown);
+          for(var i=0,lenI=nodes.length;i<lenI;i++)
+          {
+            KInstance(nodes[i],nodes[i].pre,nodes[i].post);
+          }
+        }(unknowns[x],node));
+      }
     }
 
     KInstance.replaceMap = function(map,viewmodel,isAttribute)

@@ -49,7 +49,7 @@
     "KB": "^0.7.2",
     "KMapper": "^0.2.1",
     "KObservableViewmodel": "^0.4.7",
-    "KTemplates": "^0.0.3",
+    "KTemplates": "^0.0.5",
     "kbatchloader": "^0.0.2"
   }
 }

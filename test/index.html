@@ -9,6 +9,7 @@
   <body>
     <test id="main"></test>
     <list id="list"></list>
+    <testNested id="test"></testNested>
     <script>
       require(['KInstance/Build/KInstance'],function(KInstance){
         var instance = KInstance();
@@ -38,15 +39,36 @@
 
         function listitemmodel()
         {
-
+          this.name = "";
+        }
+        
+        /* realize that items will come from testNested */
+        var testNestedTemplate = "<div class='test'><testnestedchild>{{for items loop listitem}}</testnestedchild></div>";
+        var testNestedChildTemplate = "<div class='cool'>{{html}}</div>";
+        
+        function testNested()
+        {
+          this.items = [
+              {name:'cool'},
+              {name:'stuff'},
+              {name:'fancy'}
+            ];
+        }
+        
+        function testNestedChild()
+        {
+          this.cool = 5;
         }
 
 
         instance.register('test',testModel,testTemplate);
         instance.register('list',listmodel,listTemplate);
         instance.register('listitem',listitemmodel,listItem);
+        instance.register('testnested',testNested,testNestedTemplate);
+        instance.register('testnestedchild',testNestedChild,testNestedChildTemplate);
         instance(main);
         instance(list);
+        instance(test);
       })
     </script>
   </body>
