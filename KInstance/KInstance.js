@@ -169,14 +169,14 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
           /* clear html to get ready for appendChild */
           fordata.parent.stopChange().innerHTML = "";
           
-          fordata.data = _viewmodel[fordata.binds.key];
+          fordata.data = _viewmodel.getScopeByScopeString(_viewmodel,fordata.binds.key);
           
           _unknowns.push(fordata.binds.component);
           
           /* add listeners for watching adds or removes or changes in the array */
-          watchforArray(_viewmodel[fordata.binds.key],fordata);
+          watchforArray(fordata.data,fordata);
           
-          for(var i=0,lenI=_viewmodel[fordata.binds.key].length;i<lenI;i++)
+          for(var i=0,lenI=fordata.data.length;i<lenI;i++)
           {
             (function(componentName,data,filters){
               var filtered = false;
@@ -191,7 +191,7 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
                 fordata.parent.stopChange().appendChild(comp);
                 comp = null;
               }
-            }(fordata.binds.component,_viewmodel[fordata.binds.key][i],fordata.binds.filters));
+            }(fordata.binds.component,fordata.data[i],fordata.binds.filters));
           }
         }(_forData[x]));
       }
@@ -228,10 +228,23 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
     
     function watchforArray(data,forMap)
     {
-      function onChange()
+      function onChange(e)
       {
         /* when change happens reupdate nodes depending on action, sort does flush/reapply, add/remove simply appends/removes */
-        
+        var list = fordata.parent.childNodes;
+        console.log(e);
+        if(e.type === 'add')
+        {
+
+        }
+        else if(e.type === 'remove')
+        {
+
+        }
+        else
+        {
+
+        }
       }
       
       data.addActionListener('add',onChange)
