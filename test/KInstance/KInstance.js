@@ -101,7 +101,6 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
         }
         /* update VM on change */
         console.log(e);
-
       })
       .call(null,_template);
 
