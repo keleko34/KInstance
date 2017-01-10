@@ -101,7 +101,6 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
         }
         /* update VM on change */
         console.log(e);
-
       })
       .call(null,_template);
 
@@ -176,23 +175,8 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
           /* add listeners for watching adds or removes or changes in the array */
           watchforArray(fordata.data,fordata);
           
-          for(var i=0,lenI=fordata.data.length;i<lenI;i++)
-          {
-            (function(componentName,data,filters){
-              var filtered = false;
-              for(var z=0,lenZ=filters.length;z<lenZ;z++)
-              {
-                if(filters[z](data) === false) filtered = true;
-              }
-              if(!filtered)
-              {
-                var comp = document.createElement(componentName);
-                comp.post = data;
-                fordata.parent.stopChange().appendChild(comp);
-                comp = null;
-              }
-            }(fordata.binds.component,fordata.data[i],fordata.binds.filters));
-          }
+          replaceForLoop(fordata);
+
         }(_forData[x]));
       }
       
@@ -226,30 +210,69 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
       this.args = args;
     }
     
+    function replaceForLoop(fordata)
+    {
+      for(var i=0,lenI=fordata.data.length;i<lenI;i++)
+      {
+        (function(componentName,data,filters){
+          var filtered = false;
+          for(var z=0,lenZ=filters.length;z<lenZ;z++)
+          {
+            if(filters[z](data) === false) filtered = true;
+          }
+          if(!filtered)
+          {
+            var comp = document.createElement(componentName);
+            comp.post = data;
+            fordata.parent.stopChange().appendChild(comp);
+            comp = null;
+          }
+        }(fordata.binds.component,fordata.data[i],fordata.binds.filters));
+      }
+
+    }
+
     function watchforArray(data,forMap)
     {
       function onChange(e)
       {
         /* when change happens reupdate nodes depending on action, sort does flush/reapply, add/remove simply appends/removes */
-        var list = fordata.parent.childNodes;
-        console.log(e);
-        if(e.type === 'add')
+        var list = forMap.parent.childNodes,
+            component = forMap.binds.component,
+            filters = forMap.binds.filters,
+            key = e.key,
+            value = e.event.value;
+        if(e.type === 'postadd')
         {
-
+          var newItem = document.createElement(component);
+          if(key < list.length)
+          {
+            forMap.parent.stopChange().insertBefore(newItem,key);
+          }
+          else if(key === list.length)
+          {
+            forMap.parent.stopChange().appendChild(newItem);
+          }
+          newItem.post = value;
         }
-        else if(e.type === 'remove')
+        else if(e.type === 'postremove')
         {
-
+          forMap.parent.stopChange().removeChild(list[key]);
         }
         else
         {
-
+          forMap.parent.stopChange().innerHTML = "";
+          replaceForLoop(forMap);
         }
+        replaceUnknowns(forMap.parent,[component]);
       }
       
-      data.addActionListener('add',onChange)
-      .addActionListener('remove',onChange)
-      .addActionListener('sort',onChange);
+      data.addActionListener('postadd',onChange)
+      .addActionListener('postremove',onChange)
+      .addActionListener('postsort',onChange)
+      .addActionListener('postreverse',onChange)
+      .addActionListener('postsplice',onChange)
+      .addActionListener('postfill',onChange);
     }
     
     function replaceUnknowns(node,unknowns)
