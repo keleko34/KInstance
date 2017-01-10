@@ -97,7 +97,7 @@ define(['KB','KMapper','KObservableViewmodel','KTemplates','kbatchloader'],funct
         {
           e.data.map.element = e.data.target.childNodes[0];
           e.data.map.target = e.data.map.element;
-          _template.kb_viewmodel.setScopeByScopeString(_template.kb_viewmodel,Object.keys(e.data.map.binds)[0],e.data.value);
+          e.data.target.kb_mapper.kb_viewmodel.setScopeByScopeString(e.data.target.kb_mapper.kb_viewmodel,Object.keys(e.data.map.binds)[0],e.data.value);
         }
         /* update VM on change */
         console.log(e);
